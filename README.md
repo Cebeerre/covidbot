@@ -1,0 +1,2 @@
+# covidbot
+CovidWarriors Telegram Bot
