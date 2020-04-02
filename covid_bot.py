@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 WHITE_URLS = ['covidwarriors.org', 'covidwarriors.io', 'zoom.us', 'uma.es', 'microsoft.com', 'http://bit.ly/covid-warriors-boletin']
 TOKEN = BTOKEN
-welcome_text = 'Te damos la bienvenida a CovidWarriors:\n' \
+welcome_text = 'Te damos la bienvenida a {}:\n' \
                '1) Tenemos actualizado casi en tiempo real un resumen en un BOLETÍN online disponible aquí:\n' \
                'http://bit.ly/covid-warriors-boletin\n' \
                '2) Registra tu PERFIL en la WEB http://www.covidwarriors.org y si tienes NECESIDADES o SOLUCIONES añádelas\n' \
@@ -60,7 +60,8 @@ def help(update, context):
     update.message.reply_text('Help!')
 
 def new_member(update, context):
-    update.message.reply_text(welcome_text, disable_web_page_preview=True, quote=False)
+    welcome = welcome_text.format(update.message.chat['title'])
+    update.message.reply_text(welcome, disable_web_page_preview=True, quote=False)
 
 def echo(update, context):
     db = minidb.Store(MSGDB)
