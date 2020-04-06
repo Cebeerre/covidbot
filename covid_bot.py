@@ -76,7 +76,6 @@ def new_member(update, context):
     db = minidb.Store(MEMDB)
     db.register(members)
     for member in new_members:
-        db.register(members)
         newone = members()
         newone.user_id = int(member.id)
         newone.username = member.username
