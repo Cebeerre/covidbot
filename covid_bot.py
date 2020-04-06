@@ -74,6 +74,7 @@ def new_member(update, context):
     update.message.reply_text(welcome, disable_web_page_preview=True, quote=False)
     new_members = update.message.new_chat_members
     db = minidb.Store(MEMDB)
+    db.register(members)
     for member in new_members:
         db.register(members)
         newone = members()
