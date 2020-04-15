@@ -20,7 +20,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-WHITE_URLS = ['covidwarriors.org', 'covidwarriors.io', 'zoom.us', 'uma.es', 'microsoft.com', 'http://bit.ly/covid-warriors-boletin']
+WHITE_URLS = ['covidbot.es', 'covidwarriors.org', 'covidwarriors.io', 'zoom.us', 'uma.es', 'microsoft.com', 'http://bit.ly/covid-warriors-boletin']
 TOKEN = BTOKEN
 welcome_text = 'Te damos la bienvenida a {}:\n' \
                '1) Tenemos actualizado casi en tiempo real un resumen en un BOLETÍN online disponible aquí:\n' \
