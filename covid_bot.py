@@ -14,12 +14,13 @@ BTOKEN = os.environ['BTOKEN']
 
 MSGDB = BPATH+'/messages.db'
 URLDB = BPATH+'/urls.db'
+MEMDB = BPATH+'/members.db'
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-WHITE_URLS = ['covidwarriors.org', 'covidwarriors.io', 'zoom.us', 'uma.es', 'microsoft.com', 'http://bit.ly/covid-warriors-boletin']
+WHITE_URLS = ['covidbot.es', 'covidwarriors.org', 'covidwarriors.io', 'zoom.us', 'uma.es', 'microsoft.com', 'http://bit.ly/covid-warriors-boletin']
 TOKEN = BTOKEN
 welcome_text = 'Te damos la bienvenida a {}:\n' \
                '1) Tenemos actualizado casi en tiempo real un resumen en un BOLETÍN online disponible aquí:\n' \
@@ -53,6 +54,15 @@ class urls(minidb.Model):
     date = str
     chat_title = str
 
+class members(minidb.Model):
+    user_id = int
+    username = str
+    user_first_name = str
+    user_last_name = str
+    date = str
+    chat_id = int
+    chat_title = str
+
 def start(update, context):
     update.message.reply_text('Hi!')
 
@@ -62,6 +72,21 @@ def help(update, context):
 def new_member(update, context):
     welcome = welcome_text.format(update.message.chat['title'])
     update.message.reply_text(welcome, disable_web_page_preview=True, quote=False)
+    new_members = update.message.new_chat_members
+    db = minidb.Store(MEMDB)
+    db.register(members)
+    for member in new_members:
+        newone = members()
+        newone.user_id = int(member.id)
+        newone.username = member.username
+        newone.user_first_name = member.first_name
+        newone.user_last_name = member.last_name
+        newone.date = update.message.date
+        newone.chat_id = int(update.message.chat['id'])
+        newone.chat_title = update.message.chat['title']
+        db.save(newone)
+        db.commit()
+    db.close()
 
 def echo(update, context):
     db = minidb.Store(MSGDB)
