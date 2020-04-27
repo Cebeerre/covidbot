@@ -27,7 +27,7 @@ welcome_text = 'Te damos la bienvenida a {}:\n' \
                '2) Registra tu PERFIL en la WEB http://www.covidwarriors.org y si tienes NECESIDADES o SOLUCIONES añádelas\n' \
                '3) PRESENTATE brevemente\n' \
                '4) Por favor, no generes RUIDO innecesario'
-spam_text = 'Hola soy el bot de CovidWarriors, la noticia/url que has enlazado ya se mandó el {}. Por favor, ayuda a no saturar el canal. Gracias.'
+spam_text = 'Hola soy el bot de CovidWarriors, la noticia/url ({}) que has enlazado ya se mandó el {}. Por favor, ayuda a no saturar el canal. Gracias.'
 
 from_zone = tz.tzutc()
 to_zone = tz.tzlocal()
@@ -102,7 +102,7 @@ def echo(update, context):
                     ondateutc = ondateobj.replace(tzinfo=from_zone)
                     ondatelocal = ondateutc.astimezone(to_zone)
                     datestring = ondatelocal.strftime('%Y-%m-%d a las %H:%M')
-                    custom_spam = spam_text.format(datestring)
+                    custom_spam = spam_text.format(i,datestring)
                     update.message.reply_text(custom_spam)
     dbu.close()
 
