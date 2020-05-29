@@ -12,27 +12,27 @@ import os
 BPATH = os.environ['BPATH']
 BTOKEN = os.environ['BTOKEN']
 
-MSGDB = BPATH+'/messages.db'
-URLDB = BPATH+'/urls.db'
-MEMDB = BPATH+'/members.db'
+MSGDB = BPATH + '/messages.db'
+URLDB = BPATH + '/urls.db'
+MEMDB = BPATH + '/members.db'
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-WHITE_URLS = ['covidbot.es', 'covidwarriors.org', 'covidwarriors.io', 'zoom.us', 'uma.es', 'microsoft.com', 'http://bit.ly/covid-warriors-boletin']
+WHITE_URLS = ['covidbot.es', 'covidwarriors.org', 'covidwarriors.io',
+              'zoom.us', 'uma.es', 'microsoft.com', 'http://bit.ly/covid-warriors-boletin']
 TOKEN = BTOKEN
 welcome_text = 'Te damos la bienvenida a {}:\n' \
-               '1) Tenemos actualizado casi en tiempo real un resumen en un BOLETÍN online disponible aquí:\n' \
-               'http://bit.ly/covid-warriors-boletin\n' \
-               '2) Registra tu PERFIL en la WEB http://www.covidwarriors.org y si tienes NECESIDADES o SOLUCIONES añádelas\n' \
-               '3) PRESENTATE brevemente\n' \
-               '4) Por favor, no generes RUIDO innecesario'
+               '1) Lee las normas de grupo en mensaje pineado.\n' \
+               '2) Si no lo has hecho ya, registra tu perfil, necesidades o tu organización/solución en la web http://www.covidwarriors.org\n' \
+               '3) No generes ruido innecesario'
 spam_text = 'Hola soy el bot de CovidWarriors, la noticia/url ({}) que has enlazado ya se mandó el {}. Por favor, ayuda a no saturar el canal. Gracias.'
 
 from_zone = tz.tzutc()
 to_zone = tz.tzlocal()
 timeformat = '%Y-%m-%d %H:%M:%S'
+
 
 class Message(minidb.Model):
     msg_id = int
@@ -46,6 +46,7 @@ class Message(minidb.Model):
     chat_title = str
     chat_text = str
 
+
 class urls(minidb.Model):
     url = str
     username = str
@@ -53,6 +54,7 @@ class urls(minidb.Model):
     chat_id = int
     date = str
     chat_title = str
+
 
 class members(minidb.Model):
     user_id = int
@@ -63,15 +65,19 @@ class members(minidb.Model):
     chat_id = int
     chat_title = str
 
+
 def start(update, context):
     update.message.reply_text('Hi!')
+
 
 def help(update, context):
     update.message.reply_text('Help!')
 
+
 def new_member(update, context):
     welcome = welcome_text.format(update.message.chat['title'])
-    update.message.reply_text(welcome, disable_web_page_preview=True, quote=False)
+    update.message.reply_text(
+        welcome, disable_web_page_preview=True, quote=False)
     new_members = update.message.new_chat_members
     db = minidb.Store(MEMDB)
     db.register(members)
@@ -87,6 +93,7 @@ def new_member(update, context):
         db.save(newone)
         db.commit()
     db.close()
+
 
 def echo(update, context):
     db = minidb.Store(MSGDB)
@@ -121,29 +128,34 @@ def echo(update, context):
                 dbu.save(url)
                 dbu.commit()
             else:
-                urlobj = url.get(dbu, (url.c.url == i) & (url.c.chat_id == message.chat_id))
+                urlobj = url.get(dbu, (url.c.url == i) & (
+                    url.c.chat_id == message.chat_id))
                 if update.message.message_id != urlobj.msg_id:
-                    ondateobj = datetime.strptime(urlobj.date,timeformat)
+                    ondateobj = datetime.strptime(urlobj.date, timeformat)
                     ondateutc = ondateobj.replace(tzinfo=from_zone)
                     ondatelocal = ondateutc.astimezone(to_zone)
                     datestring = ondatelocal.strftime('%Y-%m-%d a las %H:%M')
-                    custom_spam = spam_text.format(i,datestring)
+                    custom_spam = spam_text.format(i, datestring)
                     update.message.reply_text(custom_spam)
     dbu.close()
 
+
 def error(update, context):
     logger.warning('Update "%s" caused error "%s"', update, context.error)
+
 
 def main():
     updater = Updater(TOKEN, use_context=True)
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
-    dp.add_handler(MessageHandler(Filters.status_update.new_chat_members, new_member))
+    dp.add_handler(MessageHandler(
+        Filters.status_update.new_chat_members, new_member))
     dp.add_handler(MessageHandler(Filters.text, echo))
     dp.add_error_handler(error)
     updater.start_polling()
     updater.idle()
+
 
 if __name__ == '__main__':
     main()
